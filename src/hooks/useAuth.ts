@@ -4,7 +4,7 @@ import { useAuthStore } from '@/lib/store';
 import type { User } from '@/types';
 
 export const useAuth = () => {
-  const { user, isLoading, setUser, setLoading, setNDAStatus, reset } = useAuthStore();
+  const { user, isLoading, setUser, setLoading, setNDAStatus, clearAuth } = useAuthStore();
 
   useEffect(() => {
     let mounted = true;
@@ -68,7 +68,7 @@ export const useAuth = () => {
           setUser(userData);
           await checkNDAStatus(session.user.id);
         } else if (event === 'SIGNED_OUT') {
-          reset();
+          clearAuth();
         }
       }
     );
@@ -77,13 +77,13 @@ export const useAuth = () => {
       mounted = false;
       subscription.unsubscribe();
     };
-  }, [setUser, setLoading, setNDAStatus, reset]);
+  }, [setUser, setLoading, setNDAStatus, clearAuth]);
 
   const checkNDAStatus = async (userId: string) => {
     try {
       const { data, error } = await supabase
         .from('nda_signatures')
-        .select('id')
+        .select('signed_at')
         .eq('user_id', userId)
         .single();
 
@@ -92,7 +92,7 @@ export const useAuth = () => {
         return;
       }
 
-      setNDAStatus(!!data);
+      setNDAStatus(!!data, data?.signed_at);
     } catch (error) {
       console.error('Error checking NDA status:', error);
     }
