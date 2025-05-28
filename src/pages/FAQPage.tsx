@@ -7,6 +7,7 @@ import Footer from '@/components/sections/Footer';
 const FAQPage: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set());
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   const toggleExpanded = (id: string) => {
     const newExpanded = new Set(expandedItems);
@@ -25,7 +26,34 @@ const FAQPage: React.FC = () => {
         item.q.toLowerCase().includes(searchQuery.toLowerCase()) ||
         item.a.toLowerCase().includes(searchQuery.toLowerCase())
     )
-  })).filter(category => category.questions.length > 0);
+  })).filter(category => 
+    category.questions.length > 0 && 
+    (activeCategory === 'all' || category.category === activeCategory)
+  );
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'General Questions About Compliment': return '🌟';
+      case 'About the AI and the Avatar': return '🤖';
+      case 'About Quests (Main Feature)': return '🎯';
+      case 'Safety and Privacy': return '🔒';
+      case 'Rewards and Tokens': return '🪙';
+      case 'Technical Details and Platform': return '⚙️';
+      case 'Web3, Blockchain, and Advanced Tech': return '⛓️';
+      default: return '❓';
+    }
+  };
+
+  const getCategoryShortName = (category: string) => {
+    switch (category) {
+      case 'About the AI and the Avatar': return 'AI & Avatar';
+      case 'About Quests (Main Feature)': return 'Quests';
+      case 'Technical Details and Platform': return 'Technical';
+      case 'Web3, Blockchain, and Advanced Tech': return 'Web3 & Blockchain';
+      case 'General Questions About Compliment': return 'General';
+      default: return category;
+    }
+  };
 
   return (
     <div className="min-h-screen bg-primary-dark">
@@ -52,14 +80,14 @@ const FAQPage: React.FC = () => {
                 className="text-xl text-text-secondary max-w-3xl mx-auto mb-8"
                 variants={ANIMATION_VARIANTS.fadeInUp}
               >
-                Everything you need to know about Compliment's revolutionary AI technology, 
-                investment opportunity, and our vision for the future of relationships.
+                Everything you need to know about Compliment's revolutionary AI technology for 
+                real-life connections, quests, and community building.
               </motion.p>
 
               {/* Search */}
               <motion.div
                 variants={ANIMATION_VARIANTS.fadeInUp}
-                className="max-w-md mx-auto"
+                className="max-w-md mx-auto mb-8"
               >
                 <div className="relative">
                   <input
@@ -79,6 +107,36 @@ const FAQPage: React.FC = () => {
                   </svg>
                 </div>
               </motion.div>
+
+              {/* Category Filter */}
+              <motion.div
+                variants={ANIMATION_VARIANTS.fadeInUp}
+                className="flex flex-wrap justify-center gap-2 max-w-5xl mx-auto"
+              >
+                <button
+                  onClick={() => setActiveCategory('all')}
+                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 ${
+                    activeCategory === 'all'
+                      ? 'bg-primary-blue text-white shadow-glow-blue'
+                      : 'bg-primary-dark/50 text-text-secondary hover:text-text-primary border border-primary-blue/20 hover:border-primary-blue/40'
+                  }`}
+                >
+                  All Categories
+                </button>
+                {FAQ_DATA.map((category) => (
+                  <button
+                    key={category.category}
+                    onClick={() => setActiveCategory(category.category)}
+                    className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-300 whitespace-nowrap ${
+                      activeCategory === category.category
+                        ? 'bg-primary-blue text-white shadow-glow-blue'
+                        : 'bg-primary-dark/50 text-text-secondary hover:text-text-primary border border-primary-blue/20 hover:border-primary-blue/40'
+                    }`}
+                  >
+                    {getCategoryIcon(category.category)} {getCategoryShortName(category.category)}
+                  </button>
+                ))}
+              </motion.div>
             </motion.div>
           </div>
         </section>
@@ -94,7 +152,7 @@ const FAQPage: React.FC = () => {
               >
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-text-primary mb-2">No results found</h3>
-                <p className="text-text-secondary">Try searching with different keywords</p>
+                <p className="text-text-secondary">Try searching with different keywords or select a different category</p>
               </motion.div>
             ) : (
               <div className="max-w-4xl mx-auto space-y-12">
@@ -106,10 +164,8 @@ const FAQPage: React.FC = () => {
                     transition={{ delay: categoryIndex * 0.1 }}
                   >
                     <h2 className="text-2xl font-display font-bold text-primary-gold mb-6 flex items-center">
-                      {category.category === 'Technology' && '🧠'}
-                      {category.category === 'Business' && '💼'}
-                      {category.category === 'Investment' && '💰'}
-                      <span className="ml-3">{category.category}</span>
+                      <span className="text-3xl mr-3">{getCategoryIcon(category.category)}</span>
+                      <span>{category.category}</span>
                     </h2>
 
                     <div className="space-y-4">
@@ -177,7 +233,7 @@ const FAQPage: React.FC = () => {
                       })}
                     </div>
                   </motion.div>
-                ))
+                ))}
               </div>
             )}
 
@@ -193,7 +249,7 @@ const FAQPage: React.FC = () => {
                   Still have questions?
                 </h3>
                 <p className="text-text-secondary mb-6">
-                  Can't find what you're looking for? Our team is here to help.
+                  Can't find what you're looking for? Our team is here to help with any questions about Compliment.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <motion.a
