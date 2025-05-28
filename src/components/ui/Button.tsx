@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { cn } from '../../lib/utils';
+import { cn } from '@/lib/utils';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
@@ -31,13 +31,6 @@ export const Button: React.FC<ButtonProps> = ({
     sm: 'px-3 py-1.5 text-sm rounded',
     md: 'px-4 py-2 text-base rounded-md',
     lg: 'px-6 py-3 text-lg rounded-lg'
-  };
-
-  const clipPaths = {
-    primary: '',
-    secondary: 'clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px)',
-    outline: '',
-    ghost: ''
   };
 
   return (
