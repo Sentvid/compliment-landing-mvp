@@ -3,21 +3,21 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 // Components
-import Header from '@/components/sections/Header';
-import Hero from '@/components/sections/Hero';
-import VideoSection from '@/components/sections/VideoSection';
-import WishlistSection from '@/components/sections/WishlistSection';
-import FAQPreview from '@/components/sections/FAQPreview';
-import Footer from '@/components/sections/Footer';
+import { Header } from './components/sections/Header';
+import { Hero } from './components/sections/Hero';
+import { VideoSection } from './components/sections/VideoSection';
+import { WishlistSection } from './components/sections/WishlistSection';
+import { FAQPreview } from './components/sections/FAQPreview';
+import { Footer } from './components/sections/Footer';
 
 // Pages
-import FAQPage from '@/pages/FAQPage';
-import NDAPage from '@/pages/NDAPage';
-import GlossaryPage from '@/pages/GlossaryPage';
+import { FAQPage } from './pages/FAQPage';
+import { NDAPage } from './pages/NDAPage';
+import { GlossaryPage } from './pages/GlossaryPage';
 
 // Hooks
-import { useAuth } from '@/hooks/useAuth';
-import { useKeyboardNavigation } from '@/hooks/useKeyboardNavigation';
+import { useAuth } from './hooks/useAuth';
+import { useKeyboardNavigation } from './hooks/useKeyboardNavigation';
 
 function App() {
   const { isLoading } = useAuth();
