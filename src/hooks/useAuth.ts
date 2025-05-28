@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
+import { supabase, isMockMode } from '@/lib/supabase';
 import { useAuthStore } from '@/lib/store';
+import { mockUser } from '@/lib/mock';
 import type { User } from '@/types';
 
 export const useAuth = () => {
@@ -13,6 +14,22 @@ export const useAuth = () => {
     const initializeAuth = async () => {
       try {
         setLoading(true);
+        
+        // Handle mock mode
+        if (isMockMode()) {
+          if (mounted) {
+            setUser(mockUser);
+            setNDAStatus(true, new Date().toISOString());
+          }
+          return;
+        }
+        
+        // Real Supabase auth
+        if (!supabase) {
+          console.error('Supabase client not initialized');
+          return;
+        }
+        
         const { data: { session }, error } = await supabase.auth.getSession();
         
         if (error) {
@@ -48,39 +65,60 @@ export const useAuth = () => {
 
     initializeAuth();
 
-    // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (!mounted) return;
+    // Skip auth listener in mock mode
+    if (isMockMode()) {
+      return;
+    }
 
-        if (event === 'SIGNED_IN' && session?.user) {
-          const userData: User = {
-            id: session.user.id,
-            email: session.user.email!,
-            full_name: session.user.user_metadata?.full_name,
-            company: session.user.user_metadata?.company,
-            position: session.user.user_metadata?.position,
-            investor_type: session.user.user_metadata?.investor_type,
-            created_at: session.user.created_at,
-            updated_at: session.user.updated_at || session.user.created_at,
-          };
-          
-          setUser(userData);
-          await checkNDAStatus(session.user.id);
-        } else if (event === 'SIGNED_OUT') {
-          clearAuth();
+    // Listen for auth changes (only in real mode)
+    if (supabase) {
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        async (event, session) => {
+          if (!mounted) return;
+
+          if (event === 'SIGNED_IN' && session?.user) {
+            const userData: User = {
+              id: session.user.id,
+              email: session.user.email!,
+              full_name: session.user.user_metadata?.full_name,
+              company: session.user.user_metadata?.company,
+              position: session.user.user_metadata?.position,
+              investor_type: session.user.user_metadata?.investor_type,
+              created_at: session.user.created_at,
+              updated_at: session.user.updated_at || session.user.created_at,
+            };
+            
+            setUser(userData);
+            await checkNDAStatus(session.user.id);
+          } else if (event === 'SIGNED_OUT') {
+            clearAuth();
+          }
         }
-      }
-    );
+      );
+
+      return () => {
+        mounted = false;
+        subscription.unsubscribe();
+      };
+    }
 
     return () => {
       mounted = false;
-      subscription.unsubscribe();
     };
   }, [setUser, setLoading, setNDAStatus, clearAuth]);
 
   const checkNDAStatus = async (userId: string) => {
     try {
+      // Mock mode always returns signed NDA
+      if (isMockMode()) {
+        setNDAStatus(true, new Date().toISOString());
+        return;
+      }
+      
+      if (!supabase) {
+        throw new Error('Supabase client not initialized');
+      }
+      
       const { data, error } = await supabase
         .from('nda_signatures')
         .select('signed_at')
