@@ -1,39 +1,65 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import type { User, UserPermissions, UserRole } from '@/types';
+
+// Get user permissions based on role and NDA status
+const getUserPermissions = (user: User | null, hasSignedNDA: boolean): UserPermissions => {
+  if (!user) {
+    return {
+      canViewGlossary: false,
+      canSubmitFeedback: true,
+      canJoinWishlist: true,
+      canViewAnalytics: false
+    };
+  }
+
+  const isInvestor = user.investor_type === 'vc' || user.investor_type === 'angel' || user.investor_type === 'corporate';
+  
+  return {
+    canViewGlossary: hasSignedNDA,
+    canSubmitFeedback: true,
+    canJoinWishlist: true,
+    canViewAnalytics: isInvestor && hasSignedNDA
+  };
+};
 
 // Auth Store
 interface AuthState {
-  user: any | null;
+  user: User | null;
   isLoading: boolean;
   hasSignedNDA: boolean;
   ndaSignedAt: string | null;
-  setUser: (user: any | null) => void;
+  permissions: UserPermissions;
+  setUser: (user: User | null) => void;
   setLoading: (loading: boolean) => void;
   setNDAStatus: (signed: boolean, signedAt?: string) => void;
   clearAuth: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      isLoading: true,
-      hasSignedNDA: false,
-      ndaSignedAt: null,
-      setUser: (user) => set({ user }),
-      setLoading: (isLoading) => set({ isLoading }),
-      setNDAStatus: (hasSignedNDA, ndaSignedAt) => set({ hasSignedNDA, ndaSignedAt }),
-      clearAuth: () => set({ user: null, hasSignedNDA: false, ndaSignedAt: null }),
-    }),
-    {
-      name: 'compliment-auth',
-      partialize: (state) => ({
-        hasSignedNDA: state.hasSignedNDA,
-        ndaSignedAt: state.ndaSignedAt,
-      }),
-    }
-  )
-);
+export const useAuthStore = create<AuthState>()((set, get) => ({
+  user: null,
+  isLoading: true,
+  hasSignedNDA: false,
+  ndaSignedAt: null,
+  permissions: getUserPermissions(null, false),
+  setUser: (user) => {
+    const { hasSignedNDA } = get();
+    const permissions = getUserPermissions(user, hasSignedNDA);
+    set({ user, permissions });
+  },
+  setLoading: (isLoading) => set({ isLoading }),
+  setNDAStatus: (hasSignedNDA, ndaSignedAt) => {
+    const { user } = get();
+    const permissions = getUserPermissions(user, hasSignedNDA);
+    set({ hasSignedNDA, ndaSignedAt, permissions });
+  },
+  clearAuth: () => set({ 
+    user: null, 
+    hasSignedNDA: false, 
+    ndaSignedAt: null,
+    permissions: getUserPermissions(null, false)
+  }),
+}));
 
 // Modal Store
 interface ModalState {
@@ -56,21 +82,34 @@ export const useModalStore = create<ModalState>((set) => ({
 
 // UI Store
 interface UIState {
-  isMenuOpen: boolean;
+  isMobileMenuOpen: boolean;
   activeSection: string;
   scrollY: number;
   setMenuOpen: (open: boolean) => void;
+  toggleMobileMenu: () => void;
   setActiveSection: (section: string) => void;
   setScrollY: (y: number) => void;
+  openModal: (modalType: 'auth' | 'feedback') => void;
 }
 
-export const useUIStore = create<UIState>((set) => ({
-  isMenuOpen: false,
+export const useUIStore = create<UIState>((set, get) => ({
+  isMobileMenuOpen: false,
   activeSection: 'hero',
   scrollY: 0,
-  setMenuOpen: (isMenuOpen) => set({ isMenuOpen }),
+  setMenuOpen: (isMobileMenuOpen) => set({ isMobileMenuOpen }),
+  toggleMobileMenu: () => {
+    const { isMobileMenuOpen } = get();
+    set({ isMobileMenuOpen: !isMobileMenuOpen });
+  },
   setActiveSection: (activeSection) => set({ activeSection }),
   setScrollY: (scrollY) => set({ scrollY }),
+  openModal: (modalType) => {
+    if (modalType === 'auth') {
+      useModalStore.getState().setAuthModalOpen(true);
+    } else if (modalType === 'feedback') {
+      useModalStore.getState().setFeedbackModalOpen(true);
+    }
+  },
 }));
 
 // Analytics Store
