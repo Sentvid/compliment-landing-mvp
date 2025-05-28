@@ -1,14 +1,21 @@
 import { useEffect } from 'react';
-import { useUIStore } from '@/lib/store';
+import { useModalStore } from '@/lib/store';
 
 export const useKeyboardNavigation = () => {
-  const { isModalOpen, closeModal } = useUIStore();
+  const { isAuthModalOpen, isFeedbackModalOpen, setAuthModalOpen, setFeedbackModalOpen } = useModalStore();
+  
+  const isModalOpen = isAuthModalOpen || isFeedbackModalOpen;
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       // Escape closes modals
       if (e.key === 'Escape' && isModalOpen) {
-        closeModal();
+        if (isAuthModalOpen) {
+          setAuthModalOpen(false);
+        }
+        if (isFeedbackModalOpen) {
+          setFeedbackModalOpen(false);
+        }
         return;
       }
 
@@ -51,9 +58,29 @@ export const useKeyboardNavigation = () => {
           e.preventDefault();
         }
       }
+
+      // Smooth scroll to sections with Page Up/Down
+      if (e.key === 'PageDown' || e.key === 'PageUp') {
+        const sections = ['hero', 'video', 'wishlist', 'faq'];
+        const currentSection = sections.findIndex(
+          (id) => document.getElementById(id)?.getBoundingClientRect().top! <= 100
+        );
+
+        if (currentSection !== -1) {
+          const nextIndex = e.key === 'PageDown'
+            ? Math.min(currentSection + 1, sections.length - 1)
+            : Math.max(currentSection - 1, 0);
+          
+          const targetElement = document.getElementById(sections[nextIndex]);
+          if (targetElement) {
+            targetElement.scrollIntoView({ behavior: 'smooth' });
+            e.preventDefault();
+          }
+        }
+      }
     };
 
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isModalOpen, closeModal]);
+  }, [isModalOpen, isAuthModalOpen, isFeedbackModalOpen, setAuthModalOpen, setFeedbackModalOpen]);
 };
