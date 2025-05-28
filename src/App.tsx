@@ -1,19 +1,19 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 // Components
-import { Header } from './components/sections/Header';
-import { Hero } from './components/sections/Hero';
-import { VideoSection } from './components/sections/VideoSection';
-import { WishlistSection } from './components/sections/WishlistSection';
-import { FAQPreview } from './components/sections/FAQPreview';
-import { Footer } from './components/sections/Footer';
+import Header from './components/sections/Header';
+import Hero from './components/sections/Hero';
+import VideoSection from './components/sections/VideoSection';
+import WishlistSection from './components/sections/WishlistSection';
+import FAQPreview from './components/sections/FAQPreview';
+import Footer from './components/sections/Footer';
 
 // Pages
-import { FAQPage } from './pages/FAQPage';
-import { NDAPage } from './pages/NDAPage';
-import { GlossaryPage } from './pages/GlossaryPage';
+import FAQPage from './pages/FAQPage';
+import NDAPage from './pages/NDAPage';
+import GlossaryPage from './pages/GlossaryPage';
 
 // Hooks
 import { useAuth } from './hooks/useAuth';
@@ -25,13 +25,16 @@ function App() {
   // Initialize keyboard navigation
   useKeyboardNavigation();
   
-  useEffect(() => {
+  React.useEffect(() => {
     // Set up error boundary for production
     if (import.meta.env.PROD) {
-      window.addEventListener('error', (event) => {
+      const handleError = (event: ErrorEvent) => {
         console.error('Global error:', event.error);
         // Send to error tracking service
-      });
+      };
+      
+      window.addEventListener('error', handleError);
+      return () => window.removeEventListener('error', handleError);
     }
   }, []);
 
