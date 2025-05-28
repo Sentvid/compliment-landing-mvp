@@ -173,39 +173,216 @@ export const ANIMATION_VARIANTS = {
   }
 };
 
-// FAQ Data
+// FAQ Data - Updated with real content from provided JSON
 export const FAQ_DATA = [
   {
-    category: 'Technology',
+    category: 'General Questions About Compliment',
     questions: [
       {
-        q: 'How does QuantumMatch™ AI achieve 89% accuracy?',
-        a: 'Our proprietary algorithm combines Graph Neural Networks with LSTM architecture to analyze over 400 compatibility factors, including behavioral patterns, communication styles, life goals, and psychological profiles. The system continuously learns from successful long-term relationships to improve predictions.'
+        q: 'What is this, anyway?',
+        a: 'Compliment is an app that helps people meet in real life and complete fun quests together. That way, they can form new friendships, partnerships, and connections.'
       },
       {
-        q: 'What makes Tetrahedron AI different from traditional matching?',
-        a: 'Traditional dating apps focus on superficial preferences. Tetrahedron AI analyzes four fundamental dimensions: Emotional Harmony (how you handle conflicts), Personal Values (core beliefs), Social Activity (lifestyle compatibility), and Creativity (intellectual stimulation). This creates a complete compatibility picture.'
+        q: 'Why would I need it?',
+        a: 'It\'s a way to step away from endless online chats and actually get together with others. You can meet new people, join group projects, games, sports events, and more.'
       },
       {
-        q: 'How does the verification system work?',
-        a: 'Our triple-layer verification combines GPS location proof, QR code scanning during meetups, and NFC technology for proximity confirmation. This eliminates 99.7% of fake profiles and ensures authentic connections.'
+        q: 'Is it like a social network or something else?',
+        a: 'It\'s somewhat similar to a social network, but the main focus is on encouraging folks to go outside, meet in person, and earn reputation points and rewards.'
+      },
+      {
+        q: 'Why is it called "Compliment"?',
+        a: 'The name highlights the idea of support and appreciation in person: a "compliment" earned through real-life actions and trust.'
+      },
+      {
+        q: 'What do I do there?',
+        a: 'You create or complete quests (tasks) with others, have face-to-face meetups, boost your avatar, and build up reputation points.'
+      },
+      {
+        q: 'Is it for dating, or what?',
+        a: 'You can definitely meet people, but it\'s not just for romance. There are friendship, team, and business formats. The main idea is offline communication.'
+      },
+      {
+        q: 'Can I really meet people in real life?',
+        a: 'Yes. The app verifies get-togethers using QR, NFC, or location checks and rewards you for actually hanging out in person.'
+      },
+      {
+        q: 'Why is it better than just using Telegram or Instagram?',
+        a: 'Those platforms mostly involve online texting. Our goal is real-life encounters. There\'s a built-in gamification system (tokens, reputation) that makes it fun.'
       }
     ]
   },
   {
-    category: 'Business',
+    category: 'About the AI and the Avatar',
     questions: [
       {
-        q: 'What is the total addressable market?',
-        a: 'The global online dating market is $8.2B growing at 8% annually. However, our addressable market extends to the $500B relationship wellness and personal development market, as we solve fundamental compatibility issues rather than just facilitating introductions.'
+        q: 'What\'s the AI assistant for?',
+        a: 'It checks your interests and gives personal tips—such as which quests might be fun or who you might want to meet. It also offers pointers on growing your "Tetrahedron" (your personality profile).'
       },
       {
-        q: 'How do you monetize the platform?',
-        a: 'Three revenue streams: Premium subscriptions ($29.99/month) for advanced matching features, Enterprise partnerships with HR departments for team compatibility, and SCI token ecosystem for reputation rewards. Projected $50M ARR by Year 3.'
+        q: 'Why do I need to interact with the AI?',
+        a: 'It\'s there to provide smart suggestions, help you find the right quests and people, save time, and discover new ideas.'
       },
       {
-        q: 'What are your competitive advantages?',
-        a: 'Patents pending on QuantumMatch™ and Tetrahedron technologies, 89% accuracy rate (industry average is 23%), and first-mover advantage in predictive relationship modeling. Our scientific approach creates significant barriers to entry.'
+        q: 'Does it actually help, or is it just small talk?',
+        a: 'It learns from your experience and adapts to your interests. It\'s not just chatting; it guides you through quests and gives relevant advice.'
+      },
+      {
+        q: 'Does the AI know everything about me? Is that safe?',
+        a: 'It only keeps minimal data, and it\'s encrypted. The assistant won\'t share your personal info without your say-so.'
+      },
+      {
+        q: 'What does "developing your avatar" mean?',
+        a: 'You have a digital character reflecting your values, activity level, creativity, and emotions. Completing quests boosts those traits and raises your social capital.'
+      },
+      {
+        q: 'How does the AI decide what to recommend?',
+        a: 'It uses algorithms (QuantumMatch, Tetrahedron AI) to match your interests and behavior with quests and people who might be a good fit.'
+      }
+    ]
+  },
+  {
+    category: 'About Quests (Main Feature)',
+    questions: [
+      {
+        q: 'What are these "quests" in the app?',
+        a: 'They\'re real-world tasks (like "grab coffee together" or "go for a run"). They can be team-based, solo, creative, and much more.'
+      },
+      {
+        q: 'Is it a game or just tasks?',
+        a: 'It\'s both. There\'s a game-like element with progress and rewards. At the same time, you get together in real life.'
+      },
+      {
+        q: 'Why should I do them?',
+        a: 'They help you meet people and work on self-improvement. Completing a quest means carrying out an offline task with others, which is fun and raises your reputation.'
+      },
+      {
+        q: 'What do I get if I complete a quest?',
+        a: 'You earn tokens (an in-app reward), boost your Social Capital Index (SCI), make new connections, and gain interesting experiences.'
+      },
+      {
+        q: 'Can I create my own quests?',
+        a: 'Yes. After you finish the initial intro quests, you can make custom ones of your own.'
+      },
+      {
+        q: 'Are the quests online or offline?',
+        a: 'Mostly offline. Some training or onboarding quests happen online, but the main point is face-to-face meetups.'
+      },
+      {
+        q: 'Do I have to meet others? Is it safe?',
+        a: 'Yes, offline gatherings are the core idea. Safety is backed by meetup verification and a reputation system that discourages dishonesty.'
+      },
+      {
+        q: 'How do you confirm a real-life meetup happened?',
+        a: 'Through a QR code or NFC at the spot, or location tracking. The app makes sure both participants were really in the same place.'
+      }
+    ]
+  },
+  {
+    category: 'Safety and Privacy',
+    questions: [
+      {
+        q: 'What user data do you collect?',
+        a: 'Very little: a name or nickname, interests, region, and quest progress. Location data kicks in only when you confirm a meetup. There\'s no chat, so no private messages are collected.'
+      },
+      {
+        q: 'Is it anonymous?',
+        a: 'You can use a nickname and skip personal details. If you want genuine connections, though, it\'s helpful to fill out more of your profile.'
+      },
+      {
+        q: 'How can I hide if I don\'t want people seeing me?',
+        a: 'Just switch on privacy mode. Then nobody can find you, and you won\'t receive quest invites. You decide when to go "online."'
+      },
+      {
+        q: 'Can I shut off AI recommendations?',
+        a: 'Yes. You can reduce or switch them off in the personal settings.'
+      },
+      {
+        q: 'How do you handle fakes or scams?',
+        a: 'We verify meetups (QR/NFC), have a complaint feature, and track reputation scores. Anyone who cheats sees their SCI drop, and major violations lead to a ban.'
+      },
+      {
+        q: 'Can I block a user if they\'re annoying?',
+        a: 'Yes. You can file a complaint or block them so you don\'t get any more invites from that person.'
+      }
+    ]
+  },
+  {
+    category: 'Rewards and Tokens',
+    questions: [
+      {
+        q: 'What are tokens? Is this crypto?',
+        a: 'Tokens act like an internal "currency" for social activity. They\'re not on exchanges right now. It\'s a way to reward engagement and track progress.'
+      },
+      {
+        q: 'Can I earn real money with them?',
+        a: 'Not at this stage. The tokens aren\'t cashable at this time. Later, there might be programs or bonuses.'
+      },
+      {
+        q: 'Where is my balance stored?',
+        a: 'It\'s linked to your Compliment account. If you connect a Web3 wallet (once smart contracts are fully integrated), you can keep them there as well.'
+      },
+      {
+        q: 'Can I give or send my tokens to a friend?',
+        a: 'Yes. You can send "compliment-tokens" for cool achievements or as part of a group quest.'
+      },
+      {
+        q: 'Why do I need tokens if I can\'t cash them out?',
+        a: 'They\'re your social status in the community. With tokens, you can unlock features, enhance your avatar, and join exclusive quests.'
+      },
+      {
+        q: 'Can I spend them on something useful?',
+        a: 'Yes. You can use tokens for digital items (avatar skins, rare stickers, NFT badges) or to get access to special events.'
+      }
+    ]
+  },
+  {
+    category: 'Technical Details and Platform',
+    questions: [
+      {
+        q: 'Which devices can run Compliment?',
+        a: 'iOS and Android (check the App Store or Google Play). There\'s a partial web version, but it\'s mainly meant for mobile.'
+      },
+      {
+        q: 'How big is the app, and do I need to stay online?',
+        a: 'It\'s about 100–150 MB, depending on the version. You\'ll need internet for syncing quests and meetups. Some features, like the assistant\'s notes, still work offline.'
+      },
+      {
+        q: 'Does it work outside my city or country?',
+        a: 'We\'re launching in a few regions first. Once that goes well, we\'ll open it up globally. You only need location services when confirming meetups.'
+      },
+      {
+        q: 'Do I need GPS or NFC turned on?',
+        a: 'Yes, if you want the full experience. It helps with verifying meetups. You can tweak privacy settings whenever you like.'
+      },
+      {
+        q: 'If I lose my phone, what happens to my progress?',
+        a: 'Your data (progress, tokens) sits on the server under your account, so you\'ll get it all back when you reinstall on a new device.'
+      }
+    ]
+  },
+  {
+    category: 'Web3, Blockchain, and Advanced Tech',
+    questions: [
+      {
+        q: 'What do you mean by a "decentralized platform"?',
+        a: 'We follow Web3 principles—some data is stored on a blockchain (like Solana), and smart contracts handle fair distribution of rewards.'
+      },
+      {
+        q: 'What are smart contracts?',
+        a: 'They\'re programs on the blockchain that automatically handle rewards when quest conditions are met. No guesswork—everything\'s in the code.'
+      },
+      {
+        q: 'Do I need a crypto wallet to use Compliment?',
+        a: 'No. You can use it without dealing with any blockchain details. If you want to hold tokens in a wallet, you can link one.'
+      },
+      {
+        q: 'I don\'t understand Web3. Does it matter?',
+        a: 'No. Most folks can use Compliment without touching blockchain tech. It\'s running behind the scenes.'
+      },
+      {
+        q: 'Really? Why bother with blockchain at all?',
+        a: 'It helps keep things fair (reputation, rewards, voting later in a DAO). It also opens up long-term decentralized options.'
       }
     ]
   }
