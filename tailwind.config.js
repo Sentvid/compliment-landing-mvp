@@ -46,6 +46,7 @@ export default {
       boxShadow: {
         'glow-blue': '0 0 20px rgba(37, 198, 245, 0.5)',
         'glow-gold': '0 0 20px rgba(196, 155, 66, 0.5)',
+        'glow-purple': '0 0 20px rgba(107, 70, 193, 0.5)', // Added missing purple glow
       },
       animation: {
         'orbit-rotate': 'orbit-rotate 10s linear infinite',
