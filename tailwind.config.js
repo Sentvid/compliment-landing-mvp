@@ -40,6 +40,8 @@ export default {
       backgroundImage: {
         'hero-gradient': 'linear-gradient(180deg, #12131C 0%, #1E1E2E 50%, #12131C 100%)',
         'card-overlay': 'linear-gradient(135deg, rgba(37, 198, 245, 0.1) 0%, rgba(107, 70, 193, 0.1) 100%)',
+        'text-gradient-blue': 'linear-gradient(135deg, #25C6F5 0%, #6B46C1 100%)',
+        'text-gradient-gold': 'linear-gradient(135deg, #C49B42 0%, #8B6914 100%)',
       },
       boxShadow: {
         'glow-blue': '0 0 20px rgba(37, 198, 245, 0.5)',
@@ -74,5 +76,47 @@ export default {
       }
     },
   },
-  plugins: [],
+  plugins: [
+    function({ addUtilities }) {
+      const newUtilities = {
+        '.text-gradient-blue': {
+          background: 'linear-gradient(135deg, #25C6F5 0%, #6B46C1 100%)',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+          'background-clip': 'text',
+        },
+        '.text-gradient-gold': {
+          background: 'linear-gradient(135deg, #C49B42 0%, #8B6914 100%)',
+          '-webkit-background-clip': 'text',
+          '-webkit-text-fill-color': 'transparent',
+          'background-clip': 'text',
+        },
+        '.section-padding': {
+          padding: '4rem 0',
+        },
+        '.section-container': {
+          '@apply container mx-auto px-4 sm:px-6 lg:px-8': {},
+        },
+        '.scroll-snap-section': {
+          'scroll-snap-align': 'start',
+        },
+        '.scroll-snap-container': {
+          'scroll-snap-type': 'y mandatory',
+        },
+        '.nav-link': {
+          '@apply text-text-secondary hover:text-text-primary transition-colors duration-300 relative': {},
+          '&:hover::after': {
+            content: '""',
+            position: 'absolute',
+            bottom: '-4px',
+            left: '0',
+            right: '0',
+            height: '2px',
+            background: 'linear-gradient(135deg, #25C6F5 0%, #6B46C1 100%)',
+          }
+        }
+      }
+      addUtilities(newUtilities)
+    }
+  ],
 }
