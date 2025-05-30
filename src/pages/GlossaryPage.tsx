@@ -1,25 +1,19 @@
-import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useAuthStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 import { ANIMATION_VARIANTS } from '@/lib/constants';
 import Header from '@/components/sections/Header';
 import Footer from '@/components/sections/Footer';
-
-interface GlossaryTerm {
-  id: string;
-  term: string;
-  category: string;
-  definition: string;
-  technical_details: string;
-  related_patents?: string;
-  research_links?: string[];
-}
+import { GLOSSARY_TERMS, getGlossaryStats } from '@/data/glossaryTerms';
+import type { GlossaryTerm } from '@/data/glossaryTerms';
 
 const GlossaryPage: React.FC = () => {
   const { user, hasSignedNDA } = useAuthStore();
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedDifficulty, setSelectedDifficulty] = useState('all');
+  const [selectedType, setSelectedType] = useState('all');
+  const [expandedTerm, setExpandedTerm] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [hasAccess, setHasAccess] = useState(false);
 
@@ -31,7 +25,6 @@ const GlossaryPage: React.FC = () => {
       }
 
       try {
-        // Check if user has signed NDA
         const { data, error } = await supabase
           .from('nda_signatures')
           .select('id')
@@ -51,66 +44,33 @@ const GlossaryPage: React.FC = () => {
     checkAccess();
   }, [user]);
 
-  // Mock glossary data - in real app would come from protected API
-  const glossaryTerms: GlossaryTerm[] = [
-    {
-      id: '1',
-      term: 'QuantumMatch™ AI',
-      category: 'Core Technology',
-      definition: 'Revolutionary compatibility prediction system using quantum-inspired algorithms combined with Graph Neural Networks and LSTM architecture.',
-      technical_details: 'QuantumMatch™ processes over 400 compatibility factors through a hybrid GNN-LSTM architecture. The quantum-inspired component uses superposition principles to model multiple relationship possibilities simultaneously, while the GNN analyzes social graph connections and the LSTM component learns temporal relationship patterns.',
-      related_patents: 'US Patent Application #18/123,456 - "Quantum-Inspired Relationship Compatibility Prediction System"',
-      research_links: ['https://arxiv.org/quantum-social-networks', 'https://papers.compliment.tech/quantummatch-whitepaper']
-    },
-    {
-      id: '2',
-      term: 'Tetrahedron AI',
-      category: 'Core Technology',
-      definition: 'Four-dimensional personality analysis system mapping Emotional Harmony, Personal Values, Social Activity, and Creativity compatibility.',
-      technical_details: 'Tetrahedron AI uses a 4-dimensional vector space where each vertex represents one core personality dimension. The system calculates compatibility by measuring the geometric distance between two personality tetrahedrons in this space, with machine learning algorithms optimizing the dimensional weights based on successful long-term relationships.',
-      related_patents: 'US Patent Application #18/234,567 - "Multi-Dimensional Personality Compatibility Analysis"'
-    },
-    {
-      id: '3',
-      term: 'Shadow Scenarios™',
-      category: 'Predictive Analytics',
-      definition: 'Advanced simulation system that models how relationships evolve over time by predicting future compatibility scenarios.',
-      technical_details: 'Shadow Scenarios™ employs Monte Carlo simulations running 10,000+ relationship timeline scenarios. The system factors in personality evolution, life stage changes, career trajectories, and major life events to predict relationship stability over 5-10 year periods with 89% accuracy.',
-      research_links: ['https://papers.compliment.tech/shadow-scenarios-methodology']
-    },
-    {
-      id: '4',
-      term: 'Social Capital Index (SCI)',
-      category: 'Blockchain & Web3',
-      definition: 'Blockchain-based reputation system that quantifies authentic social capital and relationship-building behavior.',
-      technical_details: 'SCI operates on a custom Layer 2 blockchain solution, recording verified social interactions, relationship outcomes, and community contributions. The index uses a Byzantine Fault Tolerant consensus mechanism to prevent gaming and ensures authentic reputation scoring. Smart contracts automatically update SCI scores based on verified relationship milestones.',
-      related_patents: 'US Patent Application #18/345,678 - "Blockchain-Based Social Capital Measurement System"'
-    },
-    {
-      id: '5',
-      term: 'Verification Trinity',
-      category: 'Security & Trust',
-      definition: 'Three-layer identity verification system combining GPS location proof, QR code authentication, and NFC proximity detection.',
-      technical_details: 'Layer 1: GPS verification with ±3 meter accuracy using satellite triangulation. Layer 2: Dynamic QR codes generated every 60 seconds with cryptographic signatures. Layer 3: NFC handshake protocol requiring physical proximity within 10cm. All three layers must validate simultaneously for verified meeting confirmation.',
-    },
-    {
-      id: '6',
-      term: 'Emotional Resonance Algorithm (ERA)',
-      category: 'AI & Machine Learning',
-      definition: 'Deep learning system that analyzes communication patterns to predict emotional compatibility and conflict resolution styles.',
-      technical_details: 'ERA uses transformer-based natural language processing to analyze text communication patterns, emoji usage, response timing, and conversation flow. The algorithm identifies emotional intelligence markers, conflict resolution styles, and communication compatibility patterns with 94% accuracy in predicting relationship communication success.',
+  const difficulties = ['all', 'Basic', 'Advanced', 'Expert'];
+  const types = ['all', ...Array.from(new Set(GLOSSARY_TERMS.map(term => term.type)))];
+
+  const filteredTerms = useMemo(() => {
+    return GLOSSARY_TERMS.filter(term => {
+      const matchesSearch = searchQuery === '' || 
+        term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        term.explanation.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        term.context.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      const matchesDifficulty = selectedDifficulty === 'all' || term.difficulty === selectedDifficulty;
+      const matchesType = selectedType === 'all' || term.type === selectedType;
+      
+      return matchesSearch && matchesDifficulty && matchesType;
+    });
+  }, [searchQuery, selectedDifficulty, selectedType]);
+
+  const stats = useMemo(() => getGlossaryStats(), []);
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case 'Basic': return 'text-tetra-green bg-tetra-green/20 border-tetra-green/30';
+      case 'Advanced': return 'text-tetra-yellow bg-tetra-yellow/20 border-tetra-yellow/30';
+      case 'Expert': return 'text-tetra-red bg-tetra-red/20 border-tetra-red/30';
+      default: return 'text-text-secondary bg-primary-dark/20 border-primary-blue/30';
     }
-  ];
-
-  const categories = ['all', ...Array.from(new Set(glossaryTerms.map(term => term.category)))];
-
-  const filteredTerms = glossaryTerms.filter(term => {
-    const matchesSearch = term.term.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         term.definition.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         term.technical_details.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = selectedCategory === 'all' || term.category === selectedCategory;
-    return matchesSearch && matchesCategory;
-  });
+  };
 
   if (isLoading) {
     return (
@@ -237,15 +197,38 @@ const GlossaryPage: React.FC = () => {
                 algorithms, and innovative relationship prediction systems.
               </motion.p>
 
-              {/* Search & Filter */}
+              {/* Statistics */}
               <motion.div
                 variants={ANIMATION_VARIANTS.fadeInUp}
-                className="flex flex-col md:flex-row gap-4 max-w-2xl mx-auto"
+                className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl mx-auto mb-8"
+              >
+                <div className="bg-primary-dark/50 border border-primary-blue/20 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-primary-blue">{stats.total}</div>
+                  <div className="text-sm text-text-secondary">Total Terms</div>
+                </div>
+                <div className="bg-primary-dark/50 border border-tetra-green/20 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-tetra-green">{stats.basic}</div>
+                  <div className="text-sm text-text-secondary">Basic</div>
+                </div>
+                <div className="bg-primary-dark/50 border border-tetra-yellow/20 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-tetra-yellow">{stats.advanced}</div>
+                  <div className="text-sm text-text-secondary">Advanced</div>
+                </div>
+                <div className="bg-primary-dark/50 border border-tetra-red/20 rounded-lg p-4">
+                  <div className="text-2xl font-bold text-tetra-red">{stats.expert}</div>
+                  <div className="text-sm text-text-secondary">Expert</div>
+                </div>
+              </motion.div>
+
+              {/* Search & Filters */}
+              <motion.div
+                variants={ANIMATION_VARIANTS.fadeInUp}
+                className="flex flex-col lg:flex-row gap-4 max-w-4xl mx-auto"
               >
                 <div className="flex-1 relative">
                   <input
                     type="text"
-                    placeholder="Search terms and definitions..."
+                    placeholder="Search terms, explanations, and context..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full px-4 py-3 pl-12 bg-primary-dark/80 border border-primary-blue/30 rounded-lg text-text-primary placeholder:text-text-secondary/70 focus:outline-none focus:border-primary-blue focus:ring-1 focus:ring-primary-blue/20"
@@ -261,13 +244,25 @@ const GlossaryPage: React.FC = () => {
                 </div>
 
                 <select
-                  value={selectedCategory}
-                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  value={selectedDifficulty}
+                  onChange={(e) => setSelectedDifficulty(e.target.value)}
                   className="px-4 py-3 bg-primary-dark/80 border border-primary-blue/30 rounded-lg text-text-primary focus:outline-none focus:border-primary-blue focus:ring-1 focus:ring-primary-blue/20"
                 >
-                  {categories.map(category => (
-                    <option key={category} value={category}>
-                      {category === 'all' ? 'All Categories' : category}
+                  {difficulties.map(difficulty => (
+                    <option key={difficulty} value={difficulty}>
+                      {difficulty === 'all' ? 'All Difficulties' : difficulty}
+                    </option>
+                  ))}
+                </select>
+
+                <select
+                  value={selectedType}
+                  onChange={(e) => setSelectedType(e.target.value)}
+                  className="px-4 py-3 bg-primary-dark/80 border border-primary-blue/30 rounded-lg text-text-primary focus:outline-none focus:border-primary-blue focus:ring-1 focus:ring-primary-blue/20 min-w-0"
+                >
+                  {types.map(type => (
+                    <option key={type} value={type}>
+                      {type === 'all' ? 'All Types' : type}
                     </option>
                   ))}
                 </select>
@@ -287,68 +282,87 @@ const GlossaryPage: React.FC = () => {
               >
                 <div className="text-6xl mb-4">🔍</div>
                 <h3 className="text-xl font-semibold text-text-primary mb-2">No terms found</h3>
-                <p className="text-text-secondary">Try searching with different keywords or select a different category</p>
+                <p className="text-text-secondary">Try searching with different keywords or adjust your filters</p>
               </motion.div>
             ) : (
-              <div className="max-w-4xl mx-auto space-y-8">
+              <div className="max-w-4xl mx-auto space-y-6">
+                <div className="text-sm text-text-secondary mb-6">
+                  Showing {filteredTerms.length} of {stats.total} terms
+                </div>
+                
                 {filteredTerms.map((term, index) => (
                   <motion.article
                     key={term.id}
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: index * 0.1 }}
-                    className="bg-gradient-to-r from-primary-dark/80 to-primary-dark/60 border border-primary-blue/20 rounded-lg p-8 hover:border-primary-blue/40 transition-colors"
+                    transition={{ delay: index * 0.05 }}
+                    className="bg-gradient-to-r from-primary-dark/80 to-primary-dark/60 border border-primary-blue/20 rounded-lg overflow-hidden hover:border-primary-blue/40 transition-all duration-300"
                   >
-                    <div className="flex flex-col lg:flex-row lg:items-start lg:space-x-8">
-                      <div className="flex-1">
-                        <div className="flex items-center mb-4">
-                          <span className="inline-block bg-primary-gold/20 text-primary-gold text-xs font-semibold px-2 py-1 rounded-full mr-3">
-                            {term.category}
-                          </span>
-                          <h2 className="text-2xl font-display font-bold text-primary-blue">
+                    <div className="p-6">
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between mb-4">
+                        <div className="flex-1">
+                          <div className="flex items-center flex-wrap gap-2 mb-3">
+                            <span className={`inline-block text-xs font-semibold px-2 py-1 rounded-full border ${getDifficultyColor(term.difficulty)}`}>
+                              {term.difficulty}
+                            </span>
+                            <span className="inline-block bg-primary-gold/20 text-primary-gold text-xs font-semibold px-2 py-1 rounded-full border border-primary-gold/30">
+                              {term.type}
+                            </span>
+                            <span className="inline-block bg-secondary-purple/20 text-secondary-purple text-xs font-semibold px-2 py-1 rounded-full border border-secondary-purple/30">
+                              {term.status}
+                            </span>
+                          </div>
+                          <h2 className="text-2xl font-display font-bold text-primary-blue mb-3">
                             {term.term}
                           </h2>
                         </div>
-
-                        <p className="text-lg text-text-primary mb-4 leading-relaxed">
-                          {term.definition}
-                        </p>
-
-                        <div className="bg-primary-dark/50 border border-primary-blue/10 rounded-lg p-4 mb-6">
-                          <h3 className="text-sm font-semibold text-primary-gold mb-2 uppercase tracking-wide">
-                            Technical Implementation
-                          </h3>
-                          <p className="text-text-secondary text-sm leading-relaxed">
-                            {term.technical_details}
-                          </p>
-                        </div>
-
-                        {term.related_patents && (
-                          <div className="mb-4">
-                            <h3 className="text-sm font-semibold text-tetra-green mb-2">Related Patents</h3>
-                            <p className="text-text-secondary text-sm">{term.related_patents}</p>
-                          </div>
-                        )}
-
-                        {term.research_links && term.research_links.length > 0 && (
-                          <div>
-                            <h3 className="text-sm font-semibold text-secondary-purple mb-2">Research Papers</h3>
-                            <div className="space-y-1">
-                              {term.research_links.map((link, linkIndex) => (
-                                <a
-                                  key={linkIndex}
-                                  href={link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className="block text-primary-blue hover:text-primary-blue/80 text-sm transition-colors underline"
-                                >
-                                  {link}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        
+                        <motion.button
+                          onClick={() => setExpandedTerm(expandedTerm === term.id ? null : term.id)}
+                          className="mt-4 lg:mt-0 flex items-center text-primary-gold hover:text-primary-gold/80 transition-colors"
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                        >
+                          <span className="text-sm font-medium mr-2">
+                            {expandedTerm === term.id ? 'Show Less' : 'Show More'}
+                          </span>
+                          <motion.svg
+                            className="w-5 h-5"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                            animate={{ rotate: expandedTerm === term.id ? 180 : 0 }}
+                            transition={{ duration: 0.2 }}
+                          >
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                          </motion.svg>
+                        </motion.button>
                       </div>
+
+                      <p className="text-lg text-text-primary mb-4 leading-relaxed">
+                        {term.explanation}
+                      </p>
+
+                      <AnimatePresence>
+                        {expandedTerm === term.id && (
+                          <motion.div
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            exit={{ opacity: 0, height: 0 }}
+                            transition={{ duration: 0.3 }}
+                            className="overflow-hidden"
+                          >
+                            <div className="bg-primary-dark/50 border border-primary-blue/10 rounded-lg p-4 mb-4">
+                              <h3 className="text-sm font-semibold text-primary-gold mb-2 uppercase tracking-wide">
+                                Context & Usage
+                              </h3>
+                              <p className="text-text-secondary text-sm leading-relaxed">
+                                {term.context}
+                              </p>
+                            </div>
+                          </motion.div>
+                        )}
+                      </AnimatePresence>
                     </div>
                   </motion.article>
                 ))}
